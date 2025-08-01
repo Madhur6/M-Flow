@@ -6,8 +6,10 @@
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+//import 'package:flutter_math_fork/flutter_math.dart'; // NBT
 import 'package:flutter_math_fork/flutter_math.dart'; // NBT
 import 'package:markdown/markdown.dart' as md; // NBT
+import 'package:m_flow/functions/ddf/flutter_ddf.dart'; // NBT
 //import 'package:m_flow/dependencies/markdown/code/markdown.dart' as md; // NBT HISTORY
 
 import '_functions_io.dart' if (dart.library.js_interop) '_functions_web.dart';
@@ -501,7 +503,7 @@ if (element.textContent.contains(r'\$') || element.textContent.contains(r'$$')) 
       // NBT
 
       if (o.contains('~') || o.contains('^') || o.contains('-') || o.contains('\$\$') || o.contains('^\$')){
-      child = _buildTextWithFormatting(
+      child = buildTextWithFormatting( //_buildTextWithFormatting(
         _isInBlockquote ? o : trimText(o),  // Pass text with or without blockquote formatting
         t, // Pass the updated text style with decoration
         styleSheet, delegate.context,
@@ -1177,8 +1179,10 @@ if (alignmentIndex == 1){
     }
   }
 
+  // NBT
   // HELPER METHOD...........................................................
-  double getTextWidth(String text, TextStyle style, BuildContext context) {
+  // MOVED TO flutter_ddf.dart outside dependency folder
+  /*double getTextWidth(String text, TextStyle style, BuildContext context) {
     // TextPainter: An object that paints a TextSpan tree into a Canvas.
     final TextPainter textPainter = TextPainter(
       text: TextSpan(text: text, style: style),
@@ -1191,16 +1195,18 @@ if (alignmentIndex == 1){
 
     textPainter.layout(minWidth: 0, maxWidth: maxWidth);
     return textPainter.width;
-  }
-
+  }*/
+// END NBT
 
 
   // NBT
   // CUSTOM WIDGET TO APPLY THE SUB & SUPERSCRIPT FEATURES....
 
   // This method builds a RichText widget with support for custom formatting.
-  // It interprets specific charactars (`~` for subscript and `^` for superscript)
+  // It interprets specific charactars git(`~` for subscript and `^` for superscript)
   // within the input text and applies the corresponding formatting.
+  
+  /* // MOVED TO flutter_ddf.dart outside dependency folder 
   Widget _buildTextWithFormatting(String text, TextStyle style, MarkdownStyleSheet styleSheet, BuildContext context) {
     Widget? alignWidget;
 
@@ -1235,22 +1241,22 @@ if (alignmentIndex == 1){
 
     // UNDER TESTING, MAIN BUGS: RANGE ERRORS & NOT COMPATIBLE WHEN USED ALONG WITH OTHER SYNTAXES i.e BOLD/ITALIC/SUB-SUPER SCRIPTS...
     else if (text.contains('^\$')) {
-      print("HEY! it's working.");
+      //print("HEY! it's working.");
       int startIndex = text.indexOf('^\$', i);
       if (startIndex != -1) {
         int endIndex = text.indexOf('^\$', startIndex + 2);
       
       if (endIndex != -1 && (text[startIndex+2] != ' ') && (text[endIndex-1] != ' ')){
 
-      print("Start: $startIndex");
-      print("End: $endIndex");
+      //print("Start: $startIndex");
+      //print("End: $endIndex");
 
       String leftText = text.substring(0, startIndex);
       String centerText = endIndex != -1 ? text.substring(startIndex + 2, endIndex) : text.substring(startIndex + 2);
       String rightText = endIndex != -1 ? text.substring(endIndex+2, text.length) : '';
-      print("LEFT: $leftText");
-      print("Right: $rightText");
-      print("Center: $centerText");
+      //print("LEFT: $leftText");
+      //print("Right: $rightText");
+      //print("Center: $centerText");
 
 
       double availableWidth = MediaQuery.of(context).size.width - 40;
@@ -1548,7 +1554,7 @@ if (alignmentIndex == 1){
     }
     // Return a RichText widget that displays all the spans with the applied formatting
     return RichText(text: TextSpan(children: spans));
-  }
+  }*/
   // NBT Ends
 
 

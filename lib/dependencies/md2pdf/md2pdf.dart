@@ -37,7 +37,7 @@ import 'package:m_flow/dependencies/dart_pdf/pdf/code/widgets.dart' as pw;
 
 
 import 'package:screenshot/screenshot.dart';
-
+import 'package:m_flow/functions/ddf/pdf_ddf.dart';
 
 // computed style is a stack, each time we encounter an element like <p>... we push its style onto the stack, then pop it off at </p>
 // the top of the stack merges all of the styles of the parents.
@@ -235,7 +235,7 @@ class Styler {
        //   if (ch.text!.text == "\n"){ // NBT
          //   continue; // NBT
          // } // 
-         if (ch.text!.text != null && ch.text!.text != ''){
+         if (ch.text!.text != null && ch.text!.text != '' && ch.text!.text != "\n"){
           if (e.nodeType == Node.ELEMENT_NODE){
             var k = e as Element;
             if (k.localName!.startsWith('h')){
@@ -246,16 +246,18 @@ class Styler {
           if (ch.text!.text!.endsWith('w\$')){alignment = TextAlign.center;ch.text = pw.TextSpan(text: ch.text!.text!.replaceRange(ch.text!.text!.length-2, ch.text!.text!.length, ''), style: ch.text!.style!.copyWith(fontWeight: fw, fontSize: fontSize));
           } else if (ch.text!.text!.endsWith('r\$')){
             alignment = TextAlign.end;
-            ch.text = pw.TextSpan(text: ch.text!.text!.replaceRange(ch.text!.text!.length-3, ch.text!.text!.length, ''), style: ch.text!.style!.copyWith(fontWeight: fw, fontSize: fontSize));
+            ch.text = pw.TextSpan(text: ch.text!.text!.replaceRange(ch.text!.text!.length-3, ch.text!.text!.length, ''), style: ch.text!.style!.copyWith(fontWeight: fw, fontSize: fontSize)); // REF #UK
           }
-          
+          spans.add(ch.text!); // [T] REF #MD
+          print(ch.text!.text);
           }
+        //ch.text = pw.TextSpan(text: ch.text!.text, style: ch.text!.style != null ? ch.text!.style!.copyWith(background: pw.BoxDecoration(color: PdfColor(1.0,0.0,0.0))) : pw.TextStyle(background: pw.BoxDecoration(color: PdfColor(1.0,0.0,0.0)))); // [T] REF #UK
           //spans.add(pw.TextSpan(text: ch.text!.text!.replaceAll("\n", ""))); // This was added to fix a "bug" that causes a newline to be added causing text not to be next to the "bullet"
           //spans.add(const pw.TextSpan(text: "\n\n")); // 
           //continue; // 
        // } //
         //ch.text = pw.TextSpan(text: ch.text!.text, style: ch.text!.style!.copyWith(height: )); // NBT
-        spans.add(ch.text!);
+        //spans.add(ch.text!); // REF #MD NBT
       }
     }
     clear(align: alignment);
@@ -318,8 +320,9 @@ if (e.text!.contains(r'\$') || e.text!.contains(r'$$')) {
     //b.MarkdownBuilder().buildTextWithFormatting(text, style, styleSheet);
     //b.buildTextWithFormatting(e.text!, style.style())
 
-    if (e.text!.contains('~') || e.text!.contains('^') || e.text!.contains('-')){
-      return Chunk(widget: [buildTextWithFormattingPDF(e.text ?? "", style.style().copyWith(fontSize: 16))]);
+    if (e.text!.contains('~') || e.text!.contains('^') || e.text!.contains('--')){//')){
+      return Chunk(widget: [buildTextWithFormatting//PDF
+      (e.text ?? "", style.style().copyWith(fontSize: 16), MarkdownStyleSheet())]);
     }
 
     pw.FontWeight fw = pw.FontWeight.normal;
@@ -423,16 +426,45 @@ if (e.text!.contains(r'\$') || e.text!.contains(r'$$')) {
             final bullet =
                 st.bullet ?? pw.Text("${++style.parent().listNumber}");
             final wl = await widgetChildren(e, Style());
+            print(wl);
+            print(e.text);
+         /*   print(wl); // NBT
+            //if (wl.first.runtimeType == pw.RichText){
+            //  print(((wl.first as pw.RichText).text as pw.TextSpan).text);
+            //}
+            var list = [];
+            var index = 0;
+            wl.forEach((object){
+//              var list = [];
+              if (object.runtimeType == pw.RichText){
+                if (((object as pw.RichText).text as pw.TextSpan).text != null){
+                  //wl.remove(object);
+                  list.add(index);
+                }
+              }
+              index +=1;
+            });
+            for (var indexC in list.reversed) { // [T] REF #Re reversed Desc
+              //list.remove(value)
+              //list.removeAt(index);
+              wl.removeAt(indexC); // [T] Above
+            }
+            //list.reversed.forEach((v){ // REF #Re
+              //list.removeAt(v);
+            //});
+            print(e.text);*/ // NBT END
             final w = pw.Row(
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: <pw.Widget>[
-                  pw.SizedBox(width: 20, height: 20, child: bullet),
+                  pw.SizedBox(width: 20, height: 20, child: bullet), // C UN C
                   pw.Expanded(
-                      child: pw.Padding(
-                          padding: const pw.EdgeInsets.only(left: 10),
+                      child: pw.Padding( // NBT C UN C
+                          padding: const pw.EdgeInsets.only(left: 10), // NBT C UN C
                           child: pw.Column(
                               crossAxisAlignment: pw.CrossAxisAlignment.start,
-                              children: wl)))
+                              //mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, // NBT
+                              children:wl))) //wl))//) NBT C UN C EDIT
+                              //[wl[1]]))
                 ]);
             return Chunk(widget: [w]);
           case "blockquote":
@@ -649,12 +681,15 @@ Future<List<dynamic>> generatePdfImageFromMD(String md2,MarkdownStyleSheet style
     return [null,0]; // TODO: Should be removed
   }
 //print(md2);
+//print("t");
 if (md2.length > 1){
   String s = "";
   md2.split('\n').forEach((line){
     if (line.length > 1){
-      s += line;
+      s += line;//.replaceRange(line.length-1, line.length, "");
       s += "\n";
+      //s += "\n\n";
+    //  print(line.replaceRange(line.length-1, line.length, ""));
     }
   });
 
@@ -662,7 +697,10 @@ if (md2.length > 1){
   //md2 = md2.replaceAll('\n\n\n\n', '\n\n');
   //md2 = md2.replaceAll('\n\n', '\n'); // THis fixes a bug
   md2 = s;
+  //print(md2);
 }
+
+//print(md2);
  // print(s);
  // print(md2);
   //print(md2.contains('\n\n'));
@@ -793,9 +831,9 @@ p.PdfColor? ColorToPdfColor(Color? color){
 
 
   // NBT
-  // NOTE: this function was copyed from flutter_markdown dependency build.dart file, original code by Madhur Pandey | Modified by Imad Laggoune
+  // NOTE: this function was copyed from flutter_markdown dependency build.dart file, original code by Madhur Pandey | Modified by Imad Laggoune and Madhur Pandey
 
-
+/*
   // CUSTOM WIDGET TO APPLY THE SUB & SUPERSCRIPT FEATURES....
 
   // This method builds a RichText widget with support for custom formatting.
@@ -971,7 +1009,7 @@ buildTextWithFormattingPDF(String text, pw.TextStyle style) {
       return pw.RichText(text: pw.TextSpan(children: spans));
     }
   }
-
+*/
 
   int findClosing(String text, String symbol, int start){
         while (start < text.length && text[start] != symbol) {
@@ -1001,6 +1039,7 @@ if (md2.length > 1){
     if (line.length > 1){
       s += line;
       s += "\n";
+      //s += "\n";
     }
   });
   md2 = s;
